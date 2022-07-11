@@ -41,5 +41,4 @@ RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz && \
 
 RUN ldd --version ldd && \
     python3.7 --version && \
-    git --version && \
-    git log -1 --format=%h
+    git --version
