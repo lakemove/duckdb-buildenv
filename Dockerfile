@@ -1,0 +1,45 @@
+FROM ubuntu:16.04
+
+# steps copied from github.com/duckdb/duckdb/tree/master/.github/actions/ubuntu_16_setup/action.yml
+RUN apt-get update -y -qq && \
+    apt-get install -y -qq software-properties-common && \
+    add-apt-repository ppa:git-core/ppa && \
+    apt-get update -y -qq && \
+    apt-get install -y -qq ninja-build make gcc-multilib g++-multilib libssl-dev wget openjdk-8-jdk zip maven unixodbc-dev libc6-dev-i386 lib32readline6-dev libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext unzip build-essential checkinstall libffi-dev curl
+
+RUN wget https://github.com/git/git/archive/refs/tags/v2.18.5.tar.gz && \
+    tar xvf v2.18.5.tar.gz && \
+    cd git-2.18.5 && \
+    make && \
+    make prefix=/usr install && \
+    git --version
+
+RUN wget https://www.python.org/ftp/python/3.7.12/Python-3.7.12.tgz && \
+    tar xvf Python-3.7.12.tgz && \
+    cd Python-3.7.12 && \
+    mkdir -p pythonbin && \
+    ./configure --with-ensurepip=install && \
+    make -j && \
+    make install && \
+    python3.7 --version && \
+    python3.7 -m pip install pip && \
+    python3.7 -m pip install requests awscli
+
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-linux-x86_64.sh && \
+    chmod +x cmake-3.21.3-linux-x86_64.sh && \
+    ./cmake-3.21.3-linux-x86_64.sh --skip-license --prefix=/usr/local && \
+    cmake --version
+
+RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz && \
+    tar -xf openssl-1.1.1c.tar.gz && \
+    cd openssl-1.1.1c && \
+    ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl no-shared zlib-dynamic && \
+    make && \
+    make install && \
+    echo "/usr/local/ssl/lib" > /etc/ld.so.conf.d/openssl-1.1.1c.conf && \
+    ldconfig -v
+
+RUN ldd --version ldd && \
+    python3.7 --version && \
+    git --version && \
+    git log -1 --format=%h
